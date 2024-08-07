@@ -7,14 +7,14 @@ module.exports = class Email {
     this.to = user.email;
     this.firstName = user.name.split(' ')[0];
     this.url = url;
-    this.from = `Favour<${process.env.EMAIL_FROM}>`;
+    this.from = `Favour <${process.env.EMAIL_FROM}>`;
   }
 
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
-      // sendbrevo
+      // Using Brevo (SendinBlue) in production
       return nodemailer.createTransport({
-        services: 'Brevo',
+        service: 'Brevo',
         auth: {
           user: process.env.BREVO_USERNAME,
           pass: process.env.BREVO_PASSWORD,
@@ -22,6 +22,7 @@ module.exports = class Email {
       });
     }
 
+    // Using a local mail server in development
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
@@ -37,7 +38,8 @@ module.exports = class Email {
       `${__dirname}/../../views/email/${template}.pug`,
       { firstName: this.firstName, url: this.url, subject },
     );
-    const mailoptions = {
+
+    const mailOptions = {
       from: this.from,
       to: this.to,
       subject,
@@ -45,11 +47,16 @@ module.exports = class Email {
       text: htmlToText.fromString(html),
     };
 
-    await this.newTransport().sendMail(mailoptions);
+    try {
+      const transporter = this.newTransport();
+      await transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
   }
 
   async sendWelcome() {
-    await this.send('welcome', 'welcome to the natours Family');
+    await this.send('welcome', 'Welcome to the Natours Family');
   }
 
   async sendPasswordReset() {

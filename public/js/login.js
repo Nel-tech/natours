@@ -9,7 +9,6 @@ export const signup = async (name, email, password, passwordConfirm) => {
       showAlert('error', 'Passwords do not match');
       return;
     }
-
     const res = await axios({
       method: 'POST',
       url: '/api/v1/users/signup',
@@ -24,7 +23,7 @@ export const signup = async (name, email, password, passwordConfirm) => {
     if (res.data.status === 'success') {
       showAlert('success', 'Account created successfully');
       window.setTimeout(() => {
-        location.assign('/'); // Redirect after a successful account created
+        location.assign('/welcomeScreen'); // Redirect after a successful account created
       }, 1500);
     }
   } catch (err) {

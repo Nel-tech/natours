@@ -4,6 +4,14 @@ const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+exports.alerts = (req, res, next) => {
+  const { alert } = req.query;
+
+  if (alert === 'booking')
+    res.locals.alert =
+      "Your booking was successful! Please check your email for a confirmation.if your bookings doesn't show up here immediately, please come back later ";
+  next();
+};
 exports.getOverview = catchAsync(async (req, res, next) => {
   const tours = await Tour.find();
 
@@ -44,7 +52,11 @@ exports.getAccount = (req, res) => {
     title: 'Your account',
   });
 };
-
+exports.getwelcomeScreen = (req, res) => {
+  res.status(200).render('welcomeScreen', {
+    title: 'Authetication',
+  });
+};
 exports.getMyTours = catchAsync(async (req, res, next) => {
   const bookings = await Booking.find({ user: req.user.id });
 

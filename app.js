@@ -22,7 +22,7 @@ const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
 
-app.enable('trust proxy');
+app.enable('trust proxy', 1);
 
 app.use((req, res, next) => {
   res.setHeader(
@@ -72,6 +72,7 @@ const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
   message: 'Too many requests from this IP, please try again in an hour!',
+  keyGenerator: (req, res) => req.ip,
 });
 app.use('/api', limiter);
 

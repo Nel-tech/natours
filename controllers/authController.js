@@ -32,25 +32,26 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-    role: req.body.role,
-  });
-  const { email, password, passwordConfirm } = req.body;
+  const { name, email, password, passwordConfirm, role } = req.body;
 
   if (!email || !password || !passwordConfirm) {
     return next(new AppError('Please provide email and password!', 400));
   }
 
   if (password !== passwordConfirm) {
-    return next(new AppError('passwords do not match!', 400));
+    return next(new AppError('Passwords do not match!', 400));
   }
 
+  const newUser = await User.create({
+    name,
+    email,
+    password,
+    passwordConfirm,
+    role,
+  });
+
   const url = `${req.protocol}://${req.get('host')}/me`;
-  console.log(url);
+
   await new Email(newUser, url).sendWelcome();
 
   createSendToken(newUser, 201, req, res);
